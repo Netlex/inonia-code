@@ -21,7 +21,48 @@
     - `read_file`
     - `search_files`
     - `write_file` (только с `approved=true`)
+- Политика безопасности путей:
+    - read/search только внутри проекта,
+    - write только в `Source/`, `Plugins/`, `Content/`,
+    - deny по чувствительным директориям.
 - Editor tab `Unreal Team Agents` с виджетом `SUTAChatPanel` и отправкой сообщений в orchestrator.
+
+## Настройка DeepSeek
+
+Поддерживаются два канала конфигурации (env перекрывает ini):
+
+1. `DefaultGame.ini` / `Saved/Config/*`:
+
+```ini
+[UTA.DeepSeek]
+ApiKey=
+BaseUrl=https://api.deepseek.com
+ChatEndpoint=/chat/completions
+Model=deepseek-chat
+TimeoutSeconds=60.0
+```
+
+2. Переменные окружения:
+
+- `UTA_DEEPSEEK_API_KEY`
+- `UTA_DEEPSEEK_BASE_URL`
+- `UTA_DEEPSEEK_MODEL`
+
+## MVP tool protocol
+
+Текущий минимальный протокол ручного вызова инструмента в чате:
+
+```text
+/tool <tool_name> <json-args>
+```
+
+Примеры:
+
+```text
+/tool read_file {"path":"Source/MyModule/MyFile.cpp"}
+/tool search_files {"query":"TODO", "rootDir":"Source"}
+/tool write_file {"path":"Source/MyModule/NewFile.txt", "content":"hello", "approved":true}
+```
 
 ## Модульная архитектура
 
@@ -29,13 +70,15 @@
 
     - контракты ядра (`IUTAAgentOrchestrator`, `IUTALLMProvider`, `IUTATool`, `IUTAToolRegistry`),
     - provider settings,
+    - execution policy,
     - базовые file tools.
 
 2. **UTAChat** (Runtime)
 
     - orchestration chat-loop,
     - управление сессиями,
-    - роутинг tool-calls.
+    - роутинг tool-calls,
+    - загрузка provider-конфига.
 
 3. **UTAUI** (Editor)
 

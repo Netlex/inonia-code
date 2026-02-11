@@ -1,7 +1,5 @@
 #include "UTAChatOrchestrator.h"
 
-#include "Misc/DefaultValueHelper.h"
-
 FUTAChatOrchestrator::FUTAChatOrchestrator(
     TSharedRef<IUTALLMProvider> InProvider,
     TSharedRef<IUTAConversationStore> InConversationStore,
