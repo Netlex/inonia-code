@@ -1,5 +1,27 @@
 #include "UTAChatOrchestrator.h"
 
+#include "Serialization/JsonSerializer.h"
+
+namespace
+{
+FString BuildToolListResponse(const TArray<FString>& ToolNames)
+{
+    TArray<TSharedPtr<FJsonValue>> ToolValues;
+    for (const FString& Name : ToolNames)
+    {
+        ToolValues.Add(MakeShared<FJsonValueString>(Name));
+    }
+
+    TSharedRef<FJsonObject> Json = MakeShared<FJsonObject>();
+    Json->SetArrayField(TEXT("tools"), ToolValues);
+
+    FString Payload;
+    const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Payload);
+    FJsonSerializer::Serialize(Json, Writer);
+    return Payload;
+}
+} // namespace
+
 FUTAChatOrchestrator::FUTAChatOrchestrator(
     TSharedRef<IUTALLMProvider> InProvider,
     TSharedRef<IUTAConversationStore> InConversationStore,
@@ -29,6 +51,18 @@ bool FUTAChatOrchestrator::ProcessUserMessage(const FString& Message, FString& O
 
 bool FUTAChatOrchestrator::TryHandleToolCommand(const FString& Message, FString& OutAssistantResponse, FString& OutError)
 {
+    if (Message.Equals(TEXT("/tools"), ESearchCase::IgnoreCase))
+    {
+        if (!ToolRegistry.IsValid())
+        {
+            OutError = TEXT("Tool registry is not configured");
+            return false;
+        }
+
+        OutAssistantResponse = BuildToolListResponse(ToolRegistry->ListTools());
+        return true;
+    }
+
     // Minimal tool protocol for MVP:
     // /tool <name> <json-args>
     if (!Message.StartsWith(TEXT("/tool ")))

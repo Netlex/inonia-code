@@ -3,6 +3,8 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "Engine/Blueprint.h"
+#include "EdGraph/EdGraph.h"
+#include "EdGraph/EdGraphNode.h"
 #include "GameFramework/Actor.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Serialization/JsonSerializer.h"
@@ -132,6 +134,88 @@ FUTAToolResult FUTAReadBlueprintMetadataTool::Execute(const FString& JsonArgumen
         TagsJson->SetStringField(TagPair.Key.ToString(), TagPair.Value.AsString());
     }
     Json->SetObjectField(TEXT("tags"), TagsJson);
+
+    FUTAToolResult Result;
+    Result.bSuccess = true;
+    Result.JsonPayload = ToJsonString(Json);
+    return Result;
+}
+
+
+FString FUTAGetBlueprintGraphSummaryTool::GetName() const
+{
+    return TEXT("get_blueprint_graph_summary");
+}
+
+FUTAToolResult FUTAGetBlueprintGraphSummaryTool::Execute(const FString& JsonArguments)
+{
+    TSharedPtr<FJsonObject> Args;
+    if (!TryParseArgs(JsonArguments, Args))
+    {
+        return MakeErrorResult(TEXT("Invalid JSON arguments"));
+    }
+
+    FString AssetPath;
+    if (!Args->TryGetStringField(TEXT("assetPath"), AssetPath))
+    {
+        return MakeErrorResult(TEXT("Missing 'assetPath'"));
+    }
+
+    UObject* LoadedObject = StaticLoadObject(UBlueprint::StaticClass(), nullptr, *AssetPath);
+    UBlueprint* Blueprint = Cast<UBlueprint>(LoadedObject);
+    if (!Blueprint)
+    {
+        return MakeErrorResult(FString::Printf(TEXT("Failed to load Blueprint: %s"), *AssetPath));
+    }
+
+    TArray<TSharedPtr<FJsonValue>> GraphValues;
+
+    auto AddGraphSummary = [&GraphValues](const UEdGraph* Graph, const FString& GraphType)
+    {
+        if (!Graph)
+        {
+            return;
+        }
+
+        int32 NodeCount = 0;
+        for (const UEdGraphNode* Node : Graph->Nodes)
+        {
+            if (Node)
+            {
+                ++NodeCount;
+            }
+        }
+
+        TSharedRef<FJsonObject> GraphJson = MakeShared<FJsonObject>();
+        GraphJson->SetStringField(TEXT("graphType"), GraphType);
+        GraphJson->SetStringField(TEXT("graphName"), Graph->GetName());
+        GraphJson->SetNumberField(TEXT("nodeCount"), NodeCount);
+        GraphValues.Add(MakeShared<FJsonValueObject>(GraphJson));
+    };
+
+    for (const UEdGraph* Graph : Blueprint->UbergraphPages)
+    {
+        AddGraphSummary(Graph, TEXT("ubergraph"));
+    }
+
+    for (const UEdGraph* Graph : Blueprint->FunctionGraphs)
+    {
+        AddGraphSummary(Graph, TEXT("function"));
+    }
+
+    for (const UEdGraph* Graph : Blueprint->MacroGraphs)
+    {
+        AddGraphSummary(Graph, TEXT("macro"));
+    }
+
+    for (const UEdGraph* Graph : Blueprint->EventGraphs)
+    {
+        AddGraphSummary(Graph, TEXT("event"));
+    }
+
+    TSharedRef<FJsonObject> Json = MakeShared<FJsonObject>();
+    Json->SetStringField(TEXT("assetPath"), AssetPath);
+    Json->SetArrayField(TEXT("graphs"), GraphValues);
 
     FUTAToolResult Result;
     Result.bSuccess = true;

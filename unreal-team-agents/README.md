@@ -30,6 +30,7 @@
     - `list_blueprints`
     - `read_blueprint_metadata`
     - `create_blueprint_asset`
+    - `get_blueprint_graph_summary`
 
 ## Настройка DeepSeek
 
@@ -56,6 +57,8 @@ TimeoutSeconds=60.0
 
 Текущий минимальный протокол ручного вызова инструмента в чате:
 
+- `/tools` — вернуть список доступных инструментов.
+
 ```text
 /tool <tool_name> <json-args>
 ```
@@ -69,6 +72,7 @@ TimeoutSeconds=60.0
 /tool list_blueprints {"packagePath":"/Game"}
 /tool read_blueprint_metadata {"assetPath":"/Game/MyBP.MyBP"}
 /tool create_blueprint_asset {"packagePath":"/Game/UTA", "assetName":"BP_Enemy", "parentClass":"Actor"}
+/tool get_blueprint_graph_summary {"assetPath":"/Game/UTA/BP_Enemy.BP_Enemy"}
 ```
 
 ## Модульная архитектура

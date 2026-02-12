@@ -13,6 +13,7 @@ void FUTABlueprintModule::StartupModule()
     {
         ChatModule->RegisterTool(MakeShared<FUTAListBlueprintsTool>());
         ChatModule->RegisterTool(MakeShared<FUTAReadBlueprintMetadataTool>());
+        ChatModule->RegisterTool(MakeShared<FUTAGetBlueprintGraphSummaryTool>());
         ChatModule->RegisterTool(MakeShared<FUTACreateBlueprintAssetTool>());
     }
 }
