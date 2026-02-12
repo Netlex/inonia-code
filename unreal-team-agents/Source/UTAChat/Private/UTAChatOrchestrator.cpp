@@ -35,8 +35,9 @@ bool ParseRouterResponse(const FString& Payload, FString& OutToolName, FString& 
         return false;
     }
 
-    TSharedPtr<FJsonObject> ArgsObj;
-    if (!Json->TryGetObjectField(TEXT("args"), ArgsObj) || !ArgsObj.IsValid())
+    const TSharedPtr<FJsonValue>* ArgsValue = Json->Values.Find(TEXT("args"));
+    TSharedPtr<FJsonObject> ArgsObj = ArgsValue && ArgsValue->IsValid() ? (*ArgsValue)->AsObject() : nullptr;
+    if (!ArgsObj.IsValid())
     {
         OutArgsJson = TEXT("{}");
         return true;

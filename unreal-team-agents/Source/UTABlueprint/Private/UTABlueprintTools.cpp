@@ -44,7 +44,11 @@ UClass* ResolveParentClass(const FString& ParentClassName)
         return AActor::StaticClass();
     }
 
-    UClass* ParentClass = FindObject<UClass>(ANY_PACKAGE, *ParentClassName);
+    UClass* ParentClass = FindObject<UClass>(nullptr, *ParentClassName);
+    if (!ParentClass)
+    {
+        ParentClass = UClass::TryFindTypeSlow<UClass>(ParentClassName);
+    }
     return ParentClass ? ParentClass : AActor::StaticClass();
 }
 } // namespace

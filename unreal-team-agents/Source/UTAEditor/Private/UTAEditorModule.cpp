@@ -29,10 +29,7 @@ void FUTAEditorModule::RegisterTabSpawner()
 
 void FUTAEditorModule::UnregisterTabSpawner()
 {
-    if (FGlobalTabmanager::Get().IsValid())
-    {
-        FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(MainTabId);
-    }
+    FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(MainTabId);
 }
 
 TSharedRef<SDockTab> FUTAEditorModule::SpawnMainTab(const FSpawnTabArgs& SpawnTabArgs) const

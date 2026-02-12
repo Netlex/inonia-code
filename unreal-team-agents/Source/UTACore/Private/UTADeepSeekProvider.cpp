@@ -18,13 +18,17 @@ FString ExtractErrorMessage(const FString& ResponseBody)
         return ResponseBody;
     }
 
-    TSharedPtr<FJsonObject> ErrorObject;
-    if (JsonObject->TryGetObjectField(TEXT("error"), ErrorObject) && ErrorObject.IsValid())
+    const TSharedPtr<FJsonValue>* ErrorValue = JsonObject->Values.Find(TEXT("error"));
+    if (ErrorValue && ErrorValue->IsValid())
     {
-        FString Message;
-        if (ErrorObject->TryGetStringField(TEXT("message"), Message))
+        TSharedPtr<FJsonObject> ErrorObject = (*ErrorValue)->AsObject();
+        if (ErrorObject.IsValid())
         {
-            return Message;
+            FString Message;
+            if (ErrorObject->TryGetStringField(TEXT("message"), Message))
+            {
+                return Message;
+            }
         }
     }
 
@@ -149,8 +153,9 @@ bool FUTADeepSeekProvider::GenerateResponse(const FString& UserPrompt, FString& 
         return false;
     }
 
-    TSharedPtr<FJsonObject> MessageObject;
-    if (!ChoiceObject->TryGetObjectField(TEXT("message"), MessageObject) || !MessageObject.IsValid())
+    const TSharedPtr<FJsonValue>* MessageValue = ChoiceObject->Values.Find(TEXT("message"));
+    TSharedPtr<FJsonObject> MessageObject = MessageValue && MessageValue->IsValid() ? (*MessageValue)->AsObject() : nullptr;
+    if (!MessageObject.IsValid())
     {
         OutError = TEXT("DeepSeek response missing message object");
         return false;
