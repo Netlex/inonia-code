@@ -55,6 +55,9 @@ public:
     UPROPERTY(EditAnywhere, Config, Category = "General")
     float ProviderTimeoutSeconds = 60.0f;
 
+    UPROPERTY(EditAnywhere, Config, Category = "General")
+    bool bEnableAutoToolRouting = true;
+
     UPROPERTY(EditAnywhere, Config, Category = "Providers")
     TArray<FUTAProviderProfile> Providers;
 

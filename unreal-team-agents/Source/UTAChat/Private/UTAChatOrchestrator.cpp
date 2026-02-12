@@ -62,6 +62,17 @@ void FUTAChatOrchestrator::SetSystemPrompt(const FString& InSystemPrompt)
     SystemPrompt = InSystemPrompt;
 }
 
+
+void FUTAChatOrchestrator::SetAutoToolRoutingEnabled(bool bEnabled)
+{
+    bAutoToolRoutingEnabled = bEnabled;
+}
+
+bool FUTAChatOrchestrator::IsAutoToolRoutingEnabled() const
+{
+    return bAutoToolRoutingEnabled;
+}
+
 bool FUTAChatOrchestrator::ProcessUserMessage(const FString& Message, FString& OutAssistantResponse, FString& OutError)
 {
     ConversationStore->AppendUserMessage(Message);
@@ -72,7 +83,7 @@ bool FUTAChatOrchestrator::ProcessUserMessage(const FString& Message, FString& O
         return true;
     }
 
-    if (TryAutoExecuteToolFromNaturalLanguage(Message, OutAssistantResponse, OutError))
+    if (bAutoToolRoutingEnabled && TryAutoExecuteToolFromNaturalLanguage(Message, OutAssistantResponse, OutError))
     {
         ConversationStore->AppendAssistantMessage(OutAssistantResponse);
         return true;

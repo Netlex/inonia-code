@@ -105,6 +105,10 @@ void FUTAChatModule::StartupModule()
 
     Orchestrator = MakeShared<FUTAChatOrchestrator>(Provider, ConversationStore, ToolRegistry);
     Orchestrator->SetSystemPrompt(LoadActiveAgentSystemPrompt());
+    if (const UUTAProjectSettings* ProjectSettings = GetDefault<UUTAProjectSettings>())
+    {
+        Orchestrator->SetAutoToolRoutingEnabled(ProjectSettings->bEnableAutoToolRouting);
+    }
 }
 
 void FUTAChatModule::ShutdownModule()

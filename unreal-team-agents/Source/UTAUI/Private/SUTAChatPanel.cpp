@@ -4,6 +4,7 @@
 #include "UTAChatModule.h"
 #include "UTAChatOrchestrator.h"
 #include "Widgets/Input/SButton.h"
+#include "Widgets/Input/SCheckBox.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/SBoxPanel.h"
@@ -23,6 +24,20 @@ void SUTAChatPanel::Construct(const FArguments& InArgs)
                 SNew(STextBlock)
                 .Text(FText::FromString(TEXT("Unreal Team Agents")))
                 .Font(FAppStyle::Get().GetFontStyle("HeadingMedium"))
+            ]
+            + SVerticalBox::Slot().AutoHeight().Padding(4.0f)
+            [
+                SNew(SHorizontalBox)
+                + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+                [
+                    SAssignNew(AutoRoutingCheckbox, SCheckBox)
+                    .IsChecked(this, &SUTAChatPanel::GetAutoRoutingState)
+                    .OnCheckStateChanged(this, &SUTAChatPanel::OnAutoRoutingChanged)
+                ]
+                + SHorizontalBox::Slot().AutoWidth().Padding(6.0f, 0.0f).VAlign(VAlign_Center)
+                [
+                    SNew(STextBlock).Text(FText::FromString(TEXT("Auto tool routing")))
+                ]
             ]
             + SVerticalBox::Slot().FillHeight(0.72f).Padding(4.0f)
             [
@@ -88,6 +103,41 @@ FReply SUTAChatPanel::OnSendClicked()
 
     InputText->SetText(FText::GetEmpty());
     return FReply::Handled();
+}
+
+
+void SUTAChatPanel::OnAutoRoutingChanged(ECheckBoxState NewState)
+{
+    FUTAChatModule* ChatModule = FModuleManager::GetModulePtr<FUTAChatModule>(TEXT("UTAChat"));
+    if (!ChatModule)
+    {
+        return;
+    }
+
+    TSharedPtr<FUTAChatOrchestrator> Orchestrator = ChatModule->GetOrchestrator();
+    if (!Orchestrator.IsValid())
+    {
+        return;
+    }
+
+    Orchestrator->SetAutoToolRoutingEnabled(NewState == ECheckBoxState::Checked);
+}
+
+ECheckBoxState SUTAChatPanel::GetAutoRoutingState() const
+{
+    FUTAChatModule* ChatModule = FModuleManager::GetModulePtr<FUTAChatModule>(TEXT("UTAChat"));
+    if (!ChatModule)
+    {
+        return ECheckBoxState::Unchecked;
+    }
+
+    TSharedPtr<FUTAChatOrchestrator> Orchestrator = ChatModule->GetOrchestrator();
+    if (!Orchestrator.IsValid())
+    {
+        return ECheckBoxState::Unchecked;
+    }
+
+    return Orchestrator->IsAutoToolRoutingEnabled() ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 }
 
 void SUTAChatPanel::AppendLine(const FString& Line) const
