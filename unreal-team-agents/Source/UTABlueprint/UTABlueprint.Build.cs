@@ -14,7 +14,10 @@ public class UTABlueprint : ModuleRules
             "Kismet",
             "BlueprintGraph",
             "UnrealEd",
-            "UTACore"
+            "AssetRegistry",
+            "AssetTools",
+            "UTACore",
+            "UTAChat"
         });
     }
 }

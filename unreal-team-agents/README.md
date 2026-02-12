@@ -26,6 +26,10 @@
     - write только в `Source/`, `Plugins/`, `Content/`,
     - deny по чувствительным директориям.
 - Editor tab `Unreal Team Agents` с виджетом `SUTAChatPanel` и отправкой сообщений в orchestrator.
+- Blueprint tools v1 подключены в tool registry:
+    - `list_blueprints`
+    - `read_blueprint_metadata`
+    - `create_blueprint_asset`
 
 ## Настройка DeepSeek
 
@@ -62,6 +66,9 @@ TimeoutSeconds=60.0
 /tool read_file {"path":"Source/MyModule/MyFile.cpp"}
 /tool search_files {"query":"TODO", "rootDir":"Source"}
 /tool write_file {"path":"Source/MyModule/NewFile.txt", "content":"hello", "approved":true}
+/tool list_blueprints {"packagePath":"/Game"}
+/tool read_blueprint_metadata {"assetPath":"/Game/MyBP.MyBP"}
+/tool create_blueprint_asset {"packagePath":"/Game/UTA", "assetName":"BP_Enemy", "parentClass":"Actor"}
 ```
 
 ## Модульная архитектура

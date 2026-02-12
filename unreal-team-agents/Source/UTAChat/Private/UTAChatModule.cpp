@@ -2,7 +2,6 @@
 
 #include "Modules/ModuleManager.h"
 #include "Misc/ConfigCacheIni.h"
-#include "Misc/Paths.h"
 #include "HAL/PlatformMisc.h"
 
 #include "UTAChatOrchestrator.h"
@@ -57,7 +56,7 @@ void FUTAChatModule::StartupModule()
     Provider->Configure(LoadProviderSettings());
 
     TSharedRef<FUTAInMemoryConversationStore> ConversationStore = MakeShared<FUTAInMemoryConversationStore>();
-    TSharedRef<FUTAToolRegistry> ToolRegistry = MakeShared<FUTAToolRegistry>();
+    ToolRegistry = MakeShared<FUTAToolRegistry>();
 
     ToolRegistry->RegisterTool(MakeShared<FUTAReadFileTool>());
     ToolRegistry->RegisterTool(MakeShared<FUTASearchFilesTool>());
@@ -69,9 +68,21 @@ void FUTAChatModule::StartupModule()
 void FUTAChatModule::ShutdownModule()
 {
     Orchestrator.Reset();
+    ToolRegistry.Reset();
 }
 
 TSharedPtr<FUTAChatOrchestrator> FUTAChatModule::GetOrchestrator() const
 {
     return Orchestrator;
+}
+
+bool FUTAChatModule::RegisterTool(TSharedRef<IUTATool> Tool)
+{
+    if (!ToolRegistry.IsValid())
+    {
+        return false;
+    }
+
+    ToolRegistry->RegisterTool(Tool);
+    return true;
 }
