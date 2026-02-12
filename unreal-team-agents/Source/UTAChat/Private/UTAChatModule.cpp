@@ -1,13 +1,13 @@
 #include "UTAChatModule.h"
 
 #include "Modules/ModuleManager.h"
-#include "Misc/ConfigCacheIni.h"
 #include "HAL/PlatformMisc.h"
 
 #include "UTAChatOrchestrator.h"
 #include "UTADeepSeekProvider.h"
 #include "UTAFileTools.h"
 #include "UTAInMemoryConversationStore.h"
+#include "UTAProjectSettings.h"
 #include "UTAProviderSettings.h"
 #include "UTAToolRegistry.h"
 
@@ -17,15 +17,37 @@ FUTAProviderSettings LoadProviderSettings()
 {
     FUTAProviderSettings Settings;
 
-    if (GConfig)
+    const UUTAProjectSettings* ProjectSettings = GetDefault<UUTAProjectSettings>();
+    if (ProjectSettings)
     {
-        GConfig->GetString(TEXT("UTA.DeepSeek"), TEXT("ApiKey"), Settings.ApiKey, GGameIni);
-        GConfig->GetString(TEXT("UTA.DeepSeek"), TEXT("BaseUrl"), Settings.BaseUrl, GGameIni);
-        GConfig->GetString(TEXT("UTA.DeepSeek"), TEXT("ChatEndpoint"), Settings.ChatEndpoint, GGameIni);
-        GConfig->GetString(TEXT("UTA.DeepSeek"), TEXT("Model"), Settings.Model, GGameIni);
-        GConfig->GetFloat(TEXT("UTA.DeepSeek"), TEXT("TimeoutSeconds"), Settings.TimeoutSeconds, GGameIni);
+        Settings.TimeoutSeconds = ProjectSettings->ProviderTimeoutSeconds;
+
+        FString ActiveProviderId = TEXT("deepseek");
+        if (!ProjectSettings->ActiveAgentId.IsEmpty())
+        {
+            for (const FUTAAgentProfile& Agent : ProjectSettings->Agents)
+            {
+                if (Agent.AgentId == ProjectSettings->ActiveAgentId)
+                {
+                    ActiveProviderId = Agent.ProviderId;
+                    break;
+                }
+            }
+        }
+
+        for (const FUTAProviderProfile& ProviderProfile : ProjectSettings->Providers)
+        {
+            if (ProviderProfile.ProviderId == ActiveProviderId)
+            {
+                Settings.ApiKey = ProviderProfile.ApiKey;
+                Settings.BaseUrl = ProviderProfile.BaseUrl;
+                Settings.Model = ProviderProfile.Model;
+                break;
+            }
+        }
     }
 
+    // Environment overrides remain available for CI/dev usage.
     const FString EnvApiKey = FPlatformMisc::GetEnvironmentVariable(TEXT("UTA_DEEPSEEK_API_KEY"));
     if (!EnvApiKey.IsEmpty())
     {
@@ -46,6 +68,25 @@ FUTAProviderSettings LoadProviderSettings()
 
     return Settings;
 }
+
+FString LoadActiveAgentSystemPrompt()
+{
+    const UUTAProjectSettings* ProjectSettings = GetDefault<UUTAProjectSettings>();
+    if (!ProjectSettings)
+    {
+        return TEXT("You are Unreal Team Agents assistant.");
+    }
+
+    for (const FUTAAgentProfile& Agent : ProjectSettings->Agents)
+    {
+        if (Agent.AgentId == ProjectSettings->ActiveAgentId)
+        {
+            return Agent.SystemPrompt.IsEmpty() ? TEXT("You are Unreal Team Agents assistant.") : Agent.SystemPrompt;
+        }
+    }
+
+    return TEXT("You are Unreal Team Agents assistant.");
+}
 } // namespace
 
 IMPLEMENT_MODULE(FUTAChatModule, UTAChat)
@@ -63,6 +104,7 @@ void FUTAChatModule::StartupModule()
     ToolRegistry->RegisterTool(MakeShared<FUTAWriteFileTool>());
 
     Orchestrator = MakeShared<FUTAChatOrchestrator>(Provider, ConversationStore, ToolRegistry);
+    Orchestrator->SetSystemPrompt(LoadActiveAgentSystemPrompt());
 }
 
 void FUTAChatModule::ShutdownModule()

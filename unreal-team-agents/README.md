@@ -16,6 +16,7 @@
 
 - Модульный плагин с разделением на `UTACore`, `UTAChat`, `UTAUI`, `UTABlueprint`, `UTAEditor`.
 - DeepSeek provider (`FUTADeepSeekProvider`) c HTTP-вызовом `/chat/completions`.
+- Natural-language routing: оркестратор пытается сам выбрать инструмент по смыслу запроса (без обязательного `/tool`).
 - Базовый оркестратор чата (`FUTAChatOrchestrator`) и in-memory conversation store.
 - Tool registry и первые инструменты:
     - `read_file`
@@ -25,16 +26,25 @@
     - read/search только внутри проекта,
     - write только в `Source/`, `Plugins/`, `Content/`,
     - deny по чувствительным директориям.
-- Editor tab `Unreal Team Agents` с виджетом `SUTAChatPanel` и отправкой сообщений в orchestrator.
+- Editor tab `Unreal Team Agents` с виджетом `SUTAChatPanel`; UI строится на `FAppStyle`/стандартных Slate-виджетах в стилистике движка.
 - Blueprint tools v1 подключены в tool registry:
     - `list_blueprints`
     - `read_blueprint_metadata`
     - `create_blueprint_asset`
     - `get_blueprint_graph_summary`
 
-## Настройка DeepSeek
+## Настройка LLM и агентов (Project Settings)
 
-Поддерживаются два канала конфигурации (env перекрывает ini):
+Основной способ: **Project Settings → Plugins → Unreal Team Agents** (класс `UUTAProjectSettings`).
+
+Доступно:
+
+- список provider-профилей (id/baseUrl/model/apiKey),
+- список agent-профилей (agentId/displayName/systemPrompt/providerId),
+- выбор `ActiveAgentId`,
+- `ProviderTimeoutSeconds`.
+
+Дополнительно поддерживается ini-конфиг:
 
 1. `DefaultGame.ini` / `Saved/Config/*`:
 
@@ -53,17 +63,17 @@ TimeoutSeconds=60.0
 - `UTA_DEEPSEEK_BASE_URL`
 - `UTA_DEEPSEEK_MODEL`
 
-## MVP tool protocol
+## Работа с чатом
 
-Текущий минимальный протокол ручного вызова инструмента в чате:
+Теперь основной сценарий — писать обычным языком (например: "создай blueprint BP_Enemy в /Game/UTA"),
+а оркестратор попытается автоматически выбрать подходящий tool и выполнить его.
+
+Служебные команды для отладки остаются:
 
 - `/tools` — вернуть список доступных инструментов.
+- `/tool <tool_name> <json-args>` — прямой вызов инструмента.
 
-```text
-/tool <tool_name> <json-args>
-```
-
-Примеры:
+Примеры ручного режима:
 
 ```text
 /tool read_file {"path":"Source/MyModule/MyFile.cpp"}

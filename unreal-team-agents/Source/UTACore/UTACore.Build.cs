@@ -13,7 +13,8 @@ public class UTACore : ModuleRules
             "Engine",
             "Json",
             "JsonUtilities",
-            "HTTP"
+            "HTTP",
+            "DeveloperSettings"
         });
     }
 }

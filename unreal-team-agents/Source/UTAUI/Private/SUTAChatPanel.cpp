@@ -1,11 +1,11 @@
 #include "SUTAChatPanel.h"
 
+#include "Styling/AppStyle.h"
 #include "UTAChatModule.h"
 #include "UTAChatOrchestrator.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
 #include "Widgets/Layout/SBorder.h"
-#include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Layout/SVerticalBox.h"
 #include "Widgets/Text/STextBlock.h"
 
@@ -13,25 +13,33 @@ void SUTAChatPanel::Construct(const FArguments& InArgs)
 {
     ChildSlot
     [
-        SNew(SVerticalBox)
-        + SVerticalBox::Slot().AutoHeight().Padding(6.0f)
+        SNew(SBorder)
+        .BorderImage(FAppStyle::GetBrush("Brushes.Panel"))
+        .Padding(6.0f)
         [
-            SNew(STextBlock).Text(FText::FromString(TEXT("Unreal Team Agents (UTA)")))
-        ]
-        + SVerticalBox::Slot().FillHeight(0.7f).Padding(6.0f)
-        [
-            SAssignNew(OutputText, SMultiLineEditableTextBox)
-            .IsReadOnly(true)
-        ]
-        + SVerticalBox::Slot().FillHeight(0.2f).Padding(6.0f)
-        [
-            SAssignNew(InputText, SMultiLineEditableTextBox)
-        ]
-        + SVerticalBox::Slot().AutoHeight().Padding(6.0f)
-        [
-            SNew(SButton)
-            .Text(FText::FromString(TEXT("Send")))
-            .OnClicked(this, &SUTAChatPanel::OnSendClicked)
+            SNew(SVerticalBox)
+            + SVerticalBox::Slot().AutoHeight().Padding(4.0f)
+            [
+                SNew(STextBlock)
+                .Text(FText::FromString(TEXT("Unreal Team Agents")))
+                .Font(FAppStyle::Get().GetFontStyle("HeadingMedium"))
+            ]
+            + SVerticalBox::Slot().FillHeight(0.72f).Padding(4.0f)
+            [
+                SAssignNew(OutputText, SMultiLineEditableTextBox)
+                .IsReadOnly(true)
+            ]
+            + SVerticalBox::Slot().FillHeight(0.2f).Padding(4.0f)
+            [
+                SAssignNew(InputText, SMultiLineEditableTextBox)
+            ]
+            + SVerticalBox::Slot().AutoHeight().Padding(4.0f)
+            [
+                SNew(SButton)
+                .ButtonStyle(&FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button"))
+                .Text(FText::FromString(TEXT("Send")))
+                .OnClicked(this, &SUTAChatPanel::OnSendClicked)
+            ]
         ]
     ];
 }
