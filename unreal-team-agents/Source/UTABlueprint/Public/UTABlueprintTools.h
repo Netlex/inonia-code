@@ -3,28 +3,28 @@
 #include "CoreMinimal.h"
 #include "UTAAgentContracts.h"
 
-class FUTAListBlueprintsTool : public IUTATool
+class UTABlueprint_API FUTAListBlueprintsTool : public IUTATool
 {
 public:
     virtual FString GetName() const override;
     virtual FUTAToolResult Execute(const FString& JsonArguments) override;
 };
 
-class FUTAReadBlueprintMetadataTool : public IUTATool
+class UTABlueprint_API FUTAReadBlueprintMetadataTool : public IUTATool
 {
 public:
     virtual FString GetName() const override;
     virtual FUTAToolResult Execute(const FString& JsonArguments) override;
 };
 
-class FUTAGetBlueprintGraphSummaryTool : public IUTATool
+class UTABlueprint_API FUTAGetBlueprintGraphSummaryTool : public IUTATool
 {
 public:
     virtual FString GetName() const override;
     virtual FUTAToolResult Execute(const FString& JsonArguments) override;
 };
 
-class FUTACreateBlueprintAssetTool : public IUTATool
+class UTABlueprint_API FUTACreateBlueprintAssetTool : public IUTATool
 {
 public:
     virtual FString GetName() const override;
