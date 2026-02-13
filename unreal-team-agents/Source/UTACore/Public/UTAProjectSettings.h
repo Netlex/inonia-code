@@ -41,7 +41,7 @@ struct FUTAAgentProfile
 };
 
 UCLASS(Config = Game, DefaultConfig, meta = (DisplayName = "Unreal Team Agents"))
-class UTACore_API UUTAProjectSettings : public UDeveloperSettings
+class UTACORE_API UUTAProjectSettings : public UDeveloperSettings
 {
     GENERATED_BODY()
 

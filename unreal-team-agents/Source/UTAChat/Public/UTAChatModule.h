@@ -5,7 +5,7 @@
 
 class FUTAChatOrchestrator;
 
-class FUTAChatModule : public IModuleInterface
+class UTACHAT_API FUTAChatModule : public IModuleInterface
 {
 public:
     virtual void StartupModule() override;

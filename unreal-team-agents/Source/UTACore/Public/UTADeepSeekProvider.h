@@ -4,7 +4,7 @@
 #include "UTAAgentContracts.h"
 #include "UTAProviderSettings.h"
 
-class FUTADeepSeekProvider : public IUTALLMProvider
+class UTACORE_API FUTADeepSeekProvider : public IUTALLMProvider
 {
 public:
     virtual FString GetProviderId() const override;

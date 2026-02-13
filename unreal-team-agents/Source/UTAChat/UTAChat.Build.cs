@@ -11,7 +11,8 @@ public class UTAChat : ModuleRules
             "Core",
             "CoreUObject",
             "Engine",
-            "UTACore"
+            "UTACore",
+            "Json"
         });
     }
 }

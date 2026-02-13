@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "UTAAgentContracts.h"
 
-class UTAChat_API FUTAInMemoryConversationStore : public IUTAConversationStore
+class UTACHAT_API FUTAInMemoryConversationStore : public IUTAConversationStore
 {
 public:
     virtual void AppendUserMessage(const FString& Message) override;

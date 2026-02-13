@@ -7,7 +7,7 @@
 class SMultiLineEditableTextBox;
 class SCheckBox;
 
-class SUTAChatPanel : public SCompoundWidget
+class UTAUI_API SUTAChatPanel : public SCompoundWidget
 {
 public:
     SLATE_BEGIN_ARGS(SUTAChatPanel)

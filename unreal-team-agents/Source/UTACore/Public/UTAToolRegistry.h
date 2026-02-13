@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "UTAAgentContracts.h"
 
-class FUTAToolRegistry : public IUTAToolRegistry
+class UTACORE_API FUTAToolRegistry : public IUTAToolRegistry
 {
 public:
     virtual void RegisterTool(TSharedRef<IUTATool> Tool) override;

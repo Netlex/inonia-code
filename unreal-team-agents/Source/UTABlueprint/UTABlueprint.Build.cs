@@ -17,7 +17,8 @@ public class UTABlueprint : ModuleRules
             "AssetRegistry",
             "AssetTools",
             "UTACore",
-            "UTAChat"
+            "UTAChat",
+            "Json"
         });
     }
 }

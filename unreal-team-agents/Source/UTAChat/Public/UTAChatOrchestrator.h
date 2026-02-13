@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "UTAAgentContracts.h"
 
-class FUTAChatOrchestrator : public IUTAAgentOrchestrator
+class UTACHAT_API FUTAChatOrchestrator : public IUTAAgentOrchestrator
 {
 public:
     FUTAChatOrchestrator(

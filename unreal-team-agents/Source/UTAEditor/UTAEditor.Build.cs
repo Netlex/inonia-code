@@ -16,7 +16,6 @@ public class UTAEditor : ModuleRules
             "UnrealEd",
             "LevelEditor",
             "WorkspaceMenuStructure",
-            "WorkspaceMenuStructureCore",
             "ToolMenus",
             "UTACore",
             "UTAChat",
